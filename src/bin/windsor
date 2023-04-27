@@ -1,0 +1,25 @@
+#!/usr/bin/php
+<?php
+
+$root_app = realpath(".");
+
+if (!is_file($root_app . '/vendor/autoload.php')) {
+    exit(1);
+}
+
+require $root_app . '/vendor/autoload.php';
+
+use Windsor\CLI\Utils\Env;
+
+$classpath = Env::get("CLI_COMMAND_REGISTRY_CLASSPATH");
+if(!isset($classpath)) {
+    $classpath = "CLI";
+    $path = $root_app . "/CLI.php";
+    if(!file_exists($path)) {
+        error_log(".env file not found and CLI.php class not found in root directory. Commands cannot be registered. Exiting...");
+        exit(1);
+    }
+    require_once $path;
+}
+
+$classpath::createApp($argv, $root_app);
